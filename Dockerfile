@@ -6,6 +6,10 @@ RUN apt update && apt install -y zsh man sudo bc vim-nox curl wget git less proc
                                  net-tools dnsutils ansible openssh-client traceroute\
                                  postgresql-client default-mysql-client
 
+# Set to Pacific Time
+ENV TZ=America/Los_Angeles
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
+
 # Create non-root user
 ARG USER
 ARG PASSWD
