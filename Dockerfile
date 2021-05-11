@@ -2,7 +2,7 @@ FROM python:3.9.5
 USER root
 
 # Install basic utilities
-RUN apt update && apt install -y zsh man sudo bc vim curl wget git less procps \
+RUN apt update && apt install -y zsh man sudo bc vim-nox curl wget git less procps \
                                  net-tools dnsutils ansible openssh-client traceroute\
                                  postgresql-client default-mysql-client
 
@@ -55,5 +55,6 @@ RUN git clone https://github.com/VundleVim/Vundle.vim.git /home/$USER/.vim/bundl
 RUN chown -R $USER:$USER /home/$USER/.vim
 
 USER $USER
+RUN sudo update-alternatives --set editor /usr/bin/vim.nox
 RUN vim +PluginInstall +qall
 WORKDIR /home/$USER
