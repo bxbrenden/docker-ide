@@ -20,7 +20,7 @@ RUN git config --global user.email $GIT_EMAIL
 RUN git config --global user.name $GIT_USER
 
 # Install top-level Python deps
-RUN pip install pipenv requests ipython
+RUN pip install pipenv requests ipython flake8
 
 # Install and configure oh-my-zsh
 RUN sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
@@ -52,9 +52,11 @@ RUN chown -R $USER:$USER $SOFTWARE_DIR
 COPY files/vimrc /home/$USER/.vimrc
 RUN mkdir /home/$USER/.vim
 RUN git clone https://github.com/VundleVim/Vundle.vim.git /home/$USER/.vim/bundle/Vundle.vim
-RUN chown -R $USER:$USER /home/$USER/.vim
+RUN chown -R $USER:$USER /home/$USER/.vim*
 
 USER $USER
 RUN sudo update-alternatives --set editor /usr/bin/vim.nox
 RUN vim +PluginInstall +qall
+RUN echo "colorscheme medic_chalk" >> /home/$USER/.vimrc
+RUN echo "set background=dark" >> /home/$USER/.vimrc
 WORKDIR /home/$USER
