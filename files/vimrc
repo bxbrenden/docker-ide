@@ -1,0 +1,66 @@
+set shell=/bin/bash
+set mouse-=a
+syntax on
+
+set nocompatible              " required
+filetype off                  " required
+
+" set the runtime path to include Vundle and initialize
+set rtp+=~/.vim/bundle/Vundle.vim
+call vundle#begin()
+
+" alternatively, pass a path where Vundle should install plugins
+"call vundle#begin('~/some/path/here')
+
+" let Vundle manage Vundle, required
+Plugin 'gmarik/Vundle.vim'
+
+" add all your plugins here (note older versions of Vundle
+" used Bundle instead of Plugin)
+
+Plugin 'davidhalter/jedi-vim'
+Plugin 'tmhedberg/simpylfold'
+"Plugin 'vim-syntastic/syntastic'
+Plugin 'nvie/vim-flake8'
+Plugin 'ledger/vim-ledger'
+
+" All of your Plugins must be added before the following line
+call vundle#end()            " required
+
+filetype plugin indent on    " required
+
+" Enable python syntax highlighting
+let python_highlight_all=1
+
+"split navigations
+nnoremap <C-J> <C-W><C-J>
+nnoremap <C-K> <C-W><C-K>
+nnoremap <C-L> <C-W><C-L>
+nnoremap <C-H> <C-W><C-H>
+
+" map space bar to toggle folding
+nnoremap <space> za
+
+" Enable folding
+set foldmethod=indent
+set foldlevel=99
+
+" config for SimplyFold
+let g:SimpylFold_docstring_preview = 1
+
+" show unnecessary whitespace as red
+highlight BadWhitespace ctermbg=red guibg=darkred
+au BufRead,BufNewFile *.py,*.pyw,*.c,*.h match BadWhitespace /\s\+$/
+
+" ensure encoding is utf-8
+set encoding=utf-8
+
+" enable modelines
+set modeline
+set modelines=5
+
+" YAML
+autocmd FileType yaml setlocal ts=2 sts=2 sw=2 expandtab
+
+" HTML
+autocmd FileType html setlocal ts=2 sts=2 sw=2 expandtab
