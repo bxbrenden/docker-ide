@@ -3,7 +3,7 @@ USER root
 
 # Install basic utilities
 RUN apt update && apt install -y zsh man sudo bc vim-nox curl wget git less procps \
-                                 net-tools dnsutils ansible openssh-client traceroute\
+                                 net-tools dnsutils openssh-client traceroute\
                                  postgresql-client default-mysql-client
 
 # Set to Pacific Time
@@ -18,7 +18,7 @@ RUN /bin/bash -c "echo -e \"$PASSWD\n$PASSWD\" | passwd \"$USER\""
 COPY files/sudoers /etc/sudoers
 
 # Install top-level Python deps
-RUN pip install pipenv requests ipython flake8
+RUN pip install pipenv requests ipython flake8 ansible
 
 # Install and configure oh-my-zsh
 RUN sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
@@ -66,6 +66,11 @@ RUN echo \
   $(lsb_release -cs) stable" | tee /etc/apt/sources.list.d/docker.list > /dev/null
 RUN apt update && apt install -y docker-ce docker-ce-cli containerd.io
 RUN usermod -aG docker $USER
+
+# AWS CLI
+RUN curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+RUN unzip awscliv2.zip
+RUN ./aws/install
 
 # Do last few things as USER
 USER $USER
