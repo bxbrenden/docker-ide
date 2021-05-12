@@ -49,6 +49,12 @@ RUN wget https://nodejs.org/dist/v14.16.1/node-v14.16.1-linux-x64.tar.xz
 RUN tar xvf node-v14.16.1-linux-x64.tar.xz
 RUN ln -s $SOFTWARE_DIR/node-v14.16.1-linux-x64/bin/* /usr/local/bin 
 
+## Terraform
+RUN wget https://releases.hashicorp.com/terraform/0.15.3/terraform_0.15.3_linux_amd64.zip
+RUN sudo apt update && sudo apt install -y unzip
+RUN unzip terraform_0.15.3_linux_amd64.zip
+RUN ln -s $SOFTWARE_DIR/terraform /usr/local/bin/terraform
+
 ## Make the utilities usable
 RUN chown -R $USER:$USER $SOFTWARE_DIR
 
