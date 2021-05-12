@@ -82,8 +82,12 @@ RUN git config --global user.email $GIT_EMAIL
 RUN git config --global user.name $GIT_USER
 COPY files/ssh_config /home/$USER/.ssh/config
 
+ENV VIMRC="/home/$USER/.vimrc"
 RUN sudo update-alternatives --set editor /usr/bin/vim.nox
 RUN vim +PluginInstall +qall
-RUN echo "colorscheme medic_chalk" >> /home/$USER/.vimrc
-RUN echo "set background=dark" >> /home/$USER/.vimrc
+RUN echo "colorscheme medic_chalk" >> $VIMRC
+RUN echo "set background=dark" >> $VIMRC
+RUN echo '" show unnecessary whitespace as red' >> $VIMRC
+RUN echo "highlight BadWhitespace ctermbg=red guibg=darkred" >> $VIMRC
+RUN echo 'au BufRead,BufNewFile * match BadWhitespace /\s\+$/' >> $VIMRC
 WORKDIR /home/$USER

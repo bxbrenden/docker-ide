@@ -49,10 +49,6 @@ set foldlevel=99
 " config for SimplyFold
 let g:SimpylFold_docstring_preview = 1
 
-" show unnecessary whitespace as red
-highlight BadWhitespace ctermbg=red guibg=darkred
-au BufRead,BufNewFile *.py,*.pyw,*.c,*.h match BadWhitespace /\s\+$/
-
 " ensure encoding is utf-8
 set encoding=utf-8
 
