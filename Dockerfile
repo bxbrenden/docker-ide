@@ -17,12 +17,6 @@ RUN useradd -m -s /usr/bin/zsh -G sudo "$USER"
 RUN /bin/bash -c "echo -e \"$PASSWD\n$PASSWD\" | passwd \"$USER\""
 COPY files/sudoers /etc/sudoers
 
-# Configure git client
-ARG GIT_EMAIL
-ARG GIT_USER
-RUN git config --global user.email $GIT_EMAIL
-RUN git config --global user.name $GIT_USER
-
 # Install top-level Python deps
 RUN pip install pipenv requests ipython flake8
 
@@ -73,7 +67,16 @@ RUN echo \
 RUN apt update && apt install -y docker-ce docker-ce-cli containerd.io
 RUN usermod -aG docker $USER
 
+# Do last few things as USER
 USER $USER
+
+# Configure git client
+ARG GIT_EMAIL
+ARG GIT_USER
+RUN git config --global user.email $GIT_EMAIL
+RUN git config --global user.name $GIT_USER
+COPY files/ssh_config /home/$USER/.ssh/config
+
 RUN sudo update-alternatives --set editor /usr/bin/vim.nox
 RUN vim +PluginInstall +qall
 RUN echo "colorscheme medic_chalk" >> /home/$USER/.vimrc
