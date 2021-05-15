@@ -78,8 +78,8 @@ USER $USER
 # Configure git client
 ARG GIT_EMAIL
 ARG GIT_USER
-RUN git config --global user.email $GIT_EMAIL
-RUN git config --global user.name $GIT_USER
+RUN git config --global user.email "$GIT_EMAIL"
+RUN git config --global user.name "$GIT_USER"
 COPY files/ssh_config /home/$USER/.ssh/config
 
 ENV VIMRC="/home/$USER/.vimrc"
