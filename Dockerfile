@@ -49,6 +49,13 @@ RUN sudo apt update && sudo apt install -y unzip
 RUN unzip terraform_0.15.3_linux_amd64.zip
 RUN ln -s $SOFTWARE_DIR/terraform /usr/local/bin/terraform
 
+## lolcat
+RUN wget https://github.com/busyloop/lolcat/archive/master.zip -O lolcat-master.zip
+RUN unzip lolcat-master.zip
+WORKDIR lolcat-master/bin
+RUN gem install lolcat
+WORKDIR $SOFTWARE_DIR
+
 ## Make the utilities usable
 RUN chown -R $USER:$USER $SOFTWARE_DIR
 
