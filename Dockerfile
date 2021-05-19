@@ -88,6 +88,9 @@ ARG GIT_USER
 RUN git config --global user.email "$GIT_EMAIL"
 RUN git config --global user.name "$GIT_USER"
 COPY files/ssh_config /home/$USER/.ssh/config
+RUN curl -s https://packagecloud.io/install/repositories/github/git-lfs/script.deb.sh | sudo bash
+RUN sudo apt install -y git-lfs
+RUN git lfs install
 
 ENV VIMRC="/home/$USER/.vimrc"
 RUN sudo update-alternatives --set editor /usr/bin/vim.nox
