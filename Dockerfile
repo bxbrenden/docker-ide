@@ -1,10 +1,10 @@
-FROM python:3.9.5
+FROM debian:9.13
 USER root
 
 # Install basic utilities
 RUN apt update && apt install -y zsh man sudo bc vim-nox curl wget git less procps \
                                  net-tools dnsutils openssh-client traceroute\
-                                 postgresql-client default-mysql-client
+                                 postgresql-client default-mysql-client python3 python3-pip
 
 # Set to Pacific Time
 ENV TZ=America/Los_Angeles
@@ -18,7 +18,7 @@ RUN /bin/bash -c "echo -e \"$PASSWD\n$PASSWD\" | passwd \"$USER\""
 COPY files/sudoers /etc/sudoers
 
 # Install top-level Python deps
-RUN pip install pipenv requests ipython flake8 ansible
+RUN pip3 install pipenv requests ipython flake8 ansible
 
 # Install and configure oh-my-zsh
 RUN sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
