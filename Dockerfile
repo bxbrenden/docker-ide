@@ -2,9 +2,9 @@ FROM python:3.9.5
 USER root
 
 # Install basic utilities
-RUN apt update && apt install -y zsh man sudo bc vim-nox curl wget git less procps \
-                                 net-tools dnsutils openssh-client traceroute\
-                                 postgresql-client default-mysql-client
+RUN apt update && apt install --no-install-recommends -y zsh man sudo bc vim-nox\
+				curl wget git less procps net-tools dnsutils \
+				openssh-client traceroute postgresql-client default-mysql-client
 
 # Set to Pacific Time
 ENV TZ=America/Los_Angeles
@@ -73,6 +73,10 @@ RUN echo \
   $(lsb_release -cs) stable" | tee /etc/apt/sources.list.d/docker.list > /dev/null
 RUN apt update && apt install -y docker-ce docker-ce-cli containerd.io
 RUN usermod -aG docker $USER
+
+# Docker-Compose
+RUN curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+RUN chmod +x /usr/local/bin/docker-compose
 
 # AWS CLI
 RUN curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
