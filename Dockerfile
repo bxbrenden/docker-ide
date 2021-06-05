@@ -2,8 +2,8 @@ FROM python:3.9.5
 USER root
 
 # Install basic utilities
-RUN apt update && apt install --no-install-recommends -y zsh man sudo bc vim-nox\
-				curl wget git less procps net-tools dnsutils \
+RUN apt update && apt install --no-install-recommends -y zsh man sudo bc vim-nox telnet\
+				curl wget git less procps net-tools dnsutils netcat\
 				openssh-client traceroute postgresql-client default-mysql-client
 
 # Set to Pacific Time
