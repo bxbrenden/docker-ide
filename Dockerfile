@@ -3,7 +3,7 @@ USER root
 
 # Install basic utilities
 RUN apt update && apt install --no-install-recommends -y zsh man sudo bc vim-nox telnet\
-				curl wget git less procps net-tools dnsutils netcat\
+				curl wget git less procps net-tools dnsutils netcat pwgen\
 				openssh-client traceroute postgresql-client default-mysql-client
 
 # Set to Pacific Time
@@ -83,9 +83,6 @@ RUN curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2
 RUN unzip awscliv2.zip
 RUN ./aws/install
 
-# pwgen
-RUN apt update && apt install -y pwgen
-
 # Do last few things as USER
 USER $USER
 
@@ -108,3 +105,6 @@ RUN echo '" show unnecessary whitespace as red' >> $VIMRC
 RUN echo "highlight BadWhitespace ctermbg=red guibg=darkred" >> $VIMRC
 RUN echo 'au BufRead,BufNewFile * match BadWhitespace /\s\+$/' >> $VIMRC
 WORKDIR /home/$USER
+
+RUN mkdir /home/$USER/.config
+COPY files/flake8 /home/$USER/.config/flake8
