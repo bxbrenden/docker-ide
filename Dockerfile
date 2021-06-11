@@ -2,7 +2,7 @@ FROM python:3.9.5
 USER root
 
 # Install basic utilities
-RUN apt update && apt install --no-install-recommends -y zsh man sudo bc vim-nox telnet\
+RUN apt update && apt install --no-install-recommends -y zsh man sudo bc vim-nox telnet unzip\
 				curl wget git less procps net-tools dnsutils netcat pwgen\
 				openssh-client traceroute postgresql-client default-mysql-client
 
@@ -41,12 +41,11 @@ RUN rm linux-amd64-1.1.0.tar.gz
 ## node.js
 RUN wget https://nodejs.org/dist/v14.16.1/node-v14.16.1-linux-x64.tar.xz
 RUN tar xvf node-v14.16.1-linux-x64.tar.xz
-RUN ln -s $SOFTWARE_DIR/node-v14.16.1-linux-x64/bin/* /usr/local/bin 
+RUN ln -s $SOFTWARE_DIR/node-v14.16.1-linux-x64/bin/* /usr/local/bin
 
 ## Terraform
-RUN wget https://releases.hashicorp.com/terraform/0.15.3/terraform_0.15.3_linux_amd64.zip
-RUN sudo apt update && sudo apt install -y unzip
-RUN unzip terraform_0.15.3_linux_amd64.zip
+RUN wget https://releases.hashicorp.com/terraform/1.0.0/terraform_1.0.0_linux_amd64.zip
+RUN unzip terraform_1.0.0_linux_amd64.zip
 RUN ln -s $SOFTWARE_DIR/terraform /usr/local/bin/terraform
 
 ## lolcat
