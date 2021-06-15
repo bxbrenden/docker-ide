@@ -18,7 +18,7 @@ RUN /bin/bash -c "echo -e \"$PASSWD\n$PASSWD\" | passwd \"$USER\""
 COPY files/sudoers /etc/sudoers
 
 # Install top-level Python deps
-RUN pip install pipenv requests ipython flake8 ansible
+RUN pip install pipenv requests ipython flake8 ansible yamllint
 
 # Install and configure oh-my-zsh
 RUN sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
