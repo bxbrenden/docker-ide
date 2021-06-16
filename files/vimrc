@@ -1,4 +1,5 @@
 set shell=/bin/bash
+set backspace=indent,eol,start
 set mouse-=a
 syntax on
 
