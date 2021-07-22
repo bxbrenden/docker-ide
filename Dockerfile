@@ -3,7 +3,7 @@ USER root
 
 # Install basic utilities
 RUN apt update && apt install --no-install-recommends -y zsh man sudo bc vim-nox telnet unzip\
-				curl wget git less procps net-tools dnsutils netcat pwgen\
+				curl wget git less procps net-tools dnsutils netcat pwgen openjdk-11-jdk\
 				openssh-client traceroute postgresql-client default-mysql-client
 
 # Set to Pacific Time
@@ -17,7 +17,7 @@ RUN useradd -m -s /usr/bin/zsh -G sudo "$USER"
 RUN /bin/bash -c "echo -e \"$PASSWD\n$PASSWD\" | passwd \"$USER\""
 COPY files/sudoers /etc/sudoers
 
-# Install top-level Python deps
+# Install top-level Python deps and packages that are just easiest to manage via pip
 RUN pip install pipenv requests ipython flake8 ansible yamllint
 
 # Install and configure oh-my-zsh
@@ -81,6 +81,13 @@ RUN chmod +x /usr/local/bin/docker-compose
 RUN curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
 RUN unzip awscliv2.zip
 RUN ./aws/install
+
+# sbt for Scala
+RUN echo "deb https://repo.scala-sbt.org/scalasbt/debian all main" | tee /etc/apt/sources.list.d/sbt.list
+RUN echo "deb https://repo.scala-sbt.org/scalasbt/debian /" | tee /etc/apt/sources.list.d/sbt_old.list
+RUN curl -sL "https://keyserver.ubuntu.com/pks/lookup?op=get&search=0x2EE0EA64E40A89B84B2DF73499E82A75642AC823" | apt-key add
+RUN apt update
+RUN apt install -y sbt
 
 # Do last few things as USER
 USER $USER
