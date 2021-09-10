@@ -1,10 +1,11 @@
-FROM python:3.9.5
+FROM python:3.9.7-bullseye
 USER root
 
 # Install basic utilities
 RUN apt update && apt install --no-install-recommends -y zsh man sudo bc vim-nox telnet unzip\
 				curl wget git less procps net-tools dnsutils netcat pwgen openjdk-11-jdk\
-				openssh-client traceroute postgresql-client default-mysql-client
+				openssh-client traceroute postgresql-client default-mysql-client zip units\
+                                wait-for-it redis
 
 # Set to Pacific Time
 ENV TZ=America/Los_Angeles
@@ -18,7 +19,7 @@ RUN /bin/bash -c "echo -e \"$PASSWD\n$PASSWD\" | passwd \"$USER\""
 COPY files/sudoers /etc/sudoers
 
 # Install top-level Python deps and packages that are just easiest to manage via pip
-RUN pip install pipenv requests ipython flake8 ansible yamllint
+RUN pip install pipenv imgcat requests ipython flake8 ansible yamllint redis youtube-dl "ansible-lint[community,yamllint]"
 
 # Install and configure oh-my-zsh
 RUN sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
@@ -39,13 +40,13 @@ RUN ln -s "$SOFTWARE_DIR/linux-amd64-1.1.0/ccat" /usr/local/bin/ccat
 RUN rm linux-amd64-1.1.0.tar.gz
 
 ## node.js
-RUN wget https://nodejs.org/dist/v14.16.1/node-v14.16.1-linux-x64.tar.xz
-RUN tar xvf node-v14.16.1-linux-x64.tar.xz
-RUN ln -s $SOFTWARE_DIR/node-v14.16.1-linux-x64/bin/* /usr/local/bin
+RUN wget https://nodejs.org/dist/v16.9.0/node-v16.9.0-linux-x64.tar.xz
+RUN tar xvf node-v16.9.0-linux-x64.tar.xz
+RUN ln -s $SOFTWARE_DIR/node-v16.9.0-linux-x64/bin/* /usr/local/bin
 
 ## Terraform
-RUN wget https://releases.hashicorp.com/terraform/1.0.0/terraform_1.0.0_linux_amd64.zip
-RUN unzip terraform_1.0.0_linux_amd64.zip
+RUN wget https://releases.hashicorp.com/terraform/1.0.6/terraform_1.0.6_linux_amd64.zip
+RUN unzip terraform_1.0.6_linux_amd64.zip
 RUN ln -s $SOFTWARE_DIR/terraform /usr/local/bin/terraform
 
 ## lolcat

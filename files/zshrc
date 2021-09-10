@@ -148,12 +148,17 @@ alias nsl="nslookup"
 alias chkip="dig +short myip.opendns.com @resolver1.opendns.com"
 
 # Docker
-alias dps="docker ps"
+alias dps="docker container ls"
 alias ds="docker stop"
 alias dp="docker container prune -f"
+alias dip="docker image prune -f"
 alias dlf="docker logs --follow"
-alias dims="docker images"
+alias dims="docker image ls"
 alias dimr="docker image rm"
+alias dc="docker-compose"
+alias dcu="docker-compose up"
+alias dcd="docker-compose up -d"
+alias dcua="docker-compose up --abort-on-container-exit"
 
 # math
 function math {
