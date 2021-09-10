@@ -90,6 +90,9 @@ RUN curl -sL "https://keyserver.ubuntu.com/pks/lookup?op=get&search=0x2EE0EA64E4
 RUN apt update
 RUN apt install -y sbt
 
+# AWS CDK (CloudFormation Development Kit)
+RUN npm install -g aws-cdk
+
 # Do last few things as USER
 USER $USER
 
