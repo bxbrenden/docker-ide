@@ -103,6 +103,7 @@ source $ZSH/oh-my-zsh.sh
 #
 # PATH
 export PATH=$PATH:/home/brenden/Software/node-v16.9.0-linux-x64/bin
+export PATH=$PATH:/home/brenden/.local/bin
 
 # zsh
 alias zrc="vim ~/.zshrc"

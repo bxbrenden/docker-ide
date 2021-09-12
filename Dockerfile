@@ -118,3 +118,6 @@ WORKDIR /home/$USER
 
 RUN mkdir /home/$USER/.config
 COPY files/flake8 /home/$USER/.config/flake8
+
+#ML stuff
+RUN pip install numpy matplotlib pandas scikit-learn seaborn jupyter
