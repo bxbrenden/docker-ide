@@ -1,6 +1,6 @@
 # If you come from bash you might have to change your $PATH.
 # export PATH=$HOME/bin:/usr/local/bin:$PATH
-export USER=brenden
+export USER=$USER
 
 # Path to your oh-my-zsh installation.
 export ZSH="/root/.oh-my-zsh"
@@ -102,7 +102,10 @@ source $ZSH/oh-my-zsh.sh
 # alias ohmyzsh="mate ~/.oh-my-zsh"
 #
 # PATH
-export PATH=$PATH:/home/brenden/Software/node-v16.9.0-linux-x64/bin
+# node.js in path
+export PATH=$PATH:/home/$USER/Software/node-v16.9.0-linux-x64/bin
+# pyenv in path
+export PATH=$PATH:/home/$USER/.pyenv/bin/pyenv
 
 # zsh
 alias zrc="vim ~/.zshrc"

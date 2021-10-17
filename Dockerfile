@@ -1,11 +1,11 @@
-FROM python:3.9.7-bullseye
+FROM debian:bullseye-20211011
 USER root
 
 # Install basic utilities
-RUN apt update && apt install --no-install-recommends -y zsh man sudo bc vim-nox telnet unzip\
+RUN apt update && apt install --no-install-recommends -y zsh man file sudo bc vim-nox telnet unzip xz-utils\
 				curl wget git less procps net-tools dnsutils netcat pwgen openjdk-11-jdk\
 				openssh-client traceroute postgresql-client default-mysql-client zip units\
-                                wait-for-it redis
+                                wait-for-it redis tmux screen
 
 # Set to Pacific Time
 ENV TZ=America/Los_Angeles
@@ -18,16 +18,6 @@ RUN useradd -m -s /usr/bin/zsh -G sudo "$USER"
 RUN /bin/bash -c "echo -e \"$PASSWD\n$PASSWD\" | passwd \"$USER\""
 COPY files/sudoers /etc/sudoers
 
-# Install top-level Python deps and packages that are just easiest to manage via pip
-RUN pip install pipenv imgcat requests ipython flake8 ansible yamllint redis youtube-dl "ansible-lint[community,yamllint]"
-
-# Install and configure oh-my-zsh
-RUN sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
-COPY files/zshrc /root/.zshrc
-COPY files/zshrc /home/$USER/.zshrc
-RUN chmod 755 /root
-RUN chown $USER:$USER /home/$USER/.zshrc
-
 # Extra utilities
 ENV SOFTWARE_DIR /home/$USER/Software
 RUN mkdir $SOFTWARE_DIR
@@ -39,24 +29,17 @@ RUN tar xvf linux-amd64-1.1.0.tar.gz
 RUN ln -s "$SOFTWARE_DIR/linux-amd64-1.1.0/ccat" /usr/local/bin/ccat
 RUN rm linux-amd64-1.1.0.tar.gz
 
-## node.js
-RUN wget https://nodejs.org/dist/v16.9.0/node-v16.9.0-linux-x64.tar.xz
-RUN tar xvf node-v16.9.0-linux-x64.tar.xz
-RUN ln -s $SOFTWARE_DIR/node-v16.9.0-linux-x64/bin/* /usr/local/bin
+# node.js
+RUN wget https://nodejs.org/download/release/latest-v16.x/node-v16.11.1-linux-x64.tar.xz
+RUN tar xvf $SOFTWARE_DIR/node-v16.11.1-linux-x64.tar.xz
+RUN ln -s $SOFTWARE_DIR/node-v16.11.1-linux-x64/bin/* /usr/local/bin
 
-## Terraform
-RUN wget https://releases.hashicorp.com/terraform/1.0.6/terraform_1.0.6_linux_amd64.zip
-RUN unzip terraform_1.0.6_linux_amd64.zip
+# Terraform
+RUN wget https://releases.hashicorp.com/terraform/1.0.8/terraform_1.0.8_linux_amd64.zip
+RUN unzip terraform_1.0.8_linux_amd64.zip
 RUN ln -s $SOFTWARE_DIR/terraform /usr/local/bin/terraform
 
-## lolcat
-RUN wget https://github.com/busyloop/lolcat/archive/master.zip -O lolcat-master.zip
-RUN unzip lolcat-master.zip
-WORKDIR lolcat-master/bin
-RUN gem install lolcat
-WORKDIR $SOFTWARE_DIR
-
-## Make the utilities usable
+# Make the utilities usable
 RUN chown -R $USER:$USER $SOFTWARE_DIR
 
 # Configure vim
@@ -66,12 +49,12 @@ RUN git clone https://github.com/VundleVim/Vundle.vim.git /home/$USER/.vim/bundl
 RUN chown -R $USER:$USER /home/$USER/.vim*
 
 # Docker
-RUN apt install -y apt-transport-https ca-certificates gnupg lsb-release
+RUN apt install -y --no-install-recommends apt-transport-https ca-certificates gnupg lsb-release
 RUN curl -fsSL https://download.docker.com/linux/debian/gpg | gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
 RUN echo \
   "deb [arch=amd64 signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/debian \
   $(lsb_release -cs) stable" | tee /etc/apt/sources.list.d/docker.list > /dev/null
-RUN apt update && apt install -y docker-ce docker-ce-cli containerd.io
+RUN apt update && apt install -y --no-install-recommends docker-ce docker-ce-cli containerd.io
 RUN usermod -aG docker $USER
 
 # Docker-Compose
@@ -83,18 +66,36 @@ RUN curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2
 RUN unzip awscliv2.zip
 RUN ./aws/install
 
-# sbt for Scala
-RUN echo "deb https://repo.scala-sbt.org/scalasbt/debian all main" | tee /etc/apt/sources.list.d/sbt.list
-RUN echo "deb https://repo.scala-sbt.org/scalasbt/debian /" | tee /etc/apt/sources.list.d/sbt_old.list
-RUN curl -sL "https://keyserver.ubuntu.com/pks/lookup?op=get&search=0x2EE0EA64E40A89B84B2DF73499E82A75642AC823" | apt-key add
-RUN apt update
-RUN apt install -y sbt
-
 # AWS CDK (CloudFormation Development Kit)
 RUN npm install -g aws-cdk
 
 # Do last few things as USER
 USER $USER
+
+# Install and configure oh-my-zsh
+RUN sudo sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+COPY files/zshrc /root/.zshrc
+COPY files/zshrc /home/$USER/.zshrc
+RUN sudo chown $USER:$USER /home/$USER/.zshrc
+# node.js in path
+RUN echo "export PATH=\$PATH:/home/$USER/Software/node-v16.9.0-linux-x64/bin" >> /home/$USER/.zshrc
+# pyenv in path
+RUN echo "export PATH=\$PATH:/home/$USER/.pyenv/bin/" >> /home/$USER/.zshrc
+RUN sudo chmod 755 /root
+
+# Install pyenv and set global python interpreter
+RUN sudo apt install --no-install-recommends -y make build-essential libssl-dev zlib1g-dev libbz2-dev libreadline-dev\
+                                                libsqlite3-dev wget curl llvm libncursesw5-dev xz-utils tk-dev\
+                                                libxml2-dev libxmlsec1-dev libffi-dev liblzma-dev
+RUN curl https://pyenv.run | bash
+RUN /home/$USER/.pyenv/bin/pyenv install 3.8.12
+RUN /home/$USER/.pyenv/bin/pyenv install 3.9.7
+RUN /home/$USER/.pyenv/bin/pyenv global 3.8.12
+RUN echo 'eval "$(pyenv init --path)"' >> /home/$USER/.zshrc
+RUN echo 'eval "$(pyenv virtualenv-init -)"' >> /home/$USER/.zshrc
+
+# Install top-level Python deps and packages that are just easiest to manage via pip
+RUN /home/$USER/.pyenv/shims/pip3 install pipenv imgcat requests ipython flake8 ansible yamllint redis "ansible-lint[community,yamllint]"
 
 # Configure git client
 ARG GIT_EMAIL
