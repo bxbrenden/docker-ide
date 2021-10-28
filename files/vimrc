@@ -21,10 +21,11 @@ Plugin 'gmarik/Vundle.vim'
 
 Plugin 'davidhalter/jedi-vim'
 Plugin 'tmhedberg/simpylfold'
-"Plugin 'vim-syntastic/syntastic'
+Plugin 'mattn/emmet-vim'
 Plugin 'nvie/vim-flake8'
 Plugin 'ledger/vim-ledger'
 Plugin 'ParamagicDev/vim-medic_chalk'
+Plugin 'jvirtanen/vim-hcl'
 
 " All of your Plugins must be added before the following line
 call vundle#end()            " required

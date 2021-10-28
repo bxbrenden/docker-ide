@@ -102,7 +102,11 @@ source $ZSH/oh-my-zsh.sh
 # alias ohmyzsh="mate ~/.oh-my-zsh"
 #
 # PATH
-export PATH=$PATH:/home/brenden/Software/node-v16.9.0-linux-x64/bin
+# node.js in path
+export PATH=$PATH:/home/brenden/Software/node-v14.18.1-linux-x64/bin
+# pyenv in path
+export PATH=/home/brenden/.pyenv/bin:$PATH
+export PATH=/home/brenden/.pyenv/shims:$PATH
 
 # zsh
 alias zrc="vim ~/.zshrc"
@@ -140,6 +144,7 @@ alias flr="flask run"
 
 # filesystem navigation
 alias cdg="cd ~/git"
+alias cdl="cd ~/git/LS"
 alias dwn="cd ~/Downloads"
 alias doc="cd ~/Documents"
 alias cds="cd ~/Software"
@@ -162,8 +167,11 @@ alias dc="docker-compose"
 alias dcu="docker-compose up"
 alias dcd="docker-compose up -d"
 alias dcua="docker-compose up --abort-on-container-exit"
+alias docksock="sudo chmod a+w /var/run/docker.sock"
 
 # math
 function math {
   echo "scale=2;$1" | bc -l
 }
+
+alias mkpass="pwgen -cynsB"
