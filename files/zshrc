@@ -9,7 +9,7 @@ export ZSH="/root/.oh-my-zsh"
 # load a random theme each time oh-my-zsh is loaded, in which case,
 # to know which specific one was loaded, run: echo $RANDOM_THEME
 # See https://github.com/ohmyzsh/ohmyzsh/wiki/Themes
-ZSH_THEME="fino-time"
+ZSH_THEME="junkfood"
 
 # Set list of themes to pick from when loading at random
 # Setting this variable when ZSH_THEME=random will cause zsh to load
@@ -125,7 +125,6 @@ alias sshc="vim ~/.ssh/config"
 # git
 alias gdom="git diff origin/master"
 alias gdm="git diff master"
-export GIT_PAGER="cat"
 
 # apt
 alias aud="sudo apt update"

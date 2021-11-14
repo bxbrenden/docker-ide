@@ -27,7 +27,7 @@ RUN sudo apt install --no-install-recommends -y make build-essential libssl-dev 
                                                 libxml2-dev libxmlsec1-dev libffi-dev liblzma-dev
 RUN curl https://pyenv.run | bash
 RUN /home/$USER/.pyenv/bin/pyenv install 3.8.12
-RUN /home/$USER/.pyenv/bin/pyenv install 3.9.7
+RUN /home/$USER/.pyenv/bin/pyenv install 3.9.8
 RUN /home/$USER/.pyenv/bin/pyenv global 3.8.12
 RUN echo 'eval "$(pyenv init --path)"' >> /home/$USER/.zshrc
 RUN echo 'eval "$(pyenv virtualenv-init -)"' >> /home/$USER/.zshrc
@@ -36,12 +36,12 @@ RUN echo 'eval "$(pyenv virtualenv-init -)"' >> /home/$USER/.zshrc
 RUN /home/$USER/.pyenv/shims/pip3 install pipenv black imgcat requests ipython flake8 ansible\
                                           yamllint redis jupyter "ansible-lint[community,yamllint]"
 #Install top-level Python 3.9 deps and packages that are just easiest to manage via pip
-RUN /home/$USER/.pyenv/bin/pyenv global 3.9.7
+RUN /home/$USER/.pyenv/bin/pyenv global 3.9.8
 RUN /home/$USER/.pyenv/shims/pip3  install pipenv black imgcat requests ipython flake8 ansible\
                                           yamllint redis jupyter "ansible-lint[community,yamllint]"
 
-# Set Python3.8.12 as the default version
-RUN /home/$USER/.pyenv/bin/pyenv global 3.8.12
+# Ensure Python3.9.8 as the default version
+RUN /home/$USER/.pyenv/bin/pyenv global 3.9.8
 
 # switch back to root for a while
 USER root
