@@ -175,3 +175,4 @@ function math {
 }
 
 alias mkpass="pwgen -cynsB"
+alias clear="/usr/bin/clear -x"

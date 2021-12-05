@@ -107,6 +107,8 @@ ARG GIT_EMAIL
 ARG GIT_USER
 RUN git config --global user.email "$GIT_EMAIL"
 RUN git config --global user.name "$GIT_USER"
+RUN git config --global init.defaultBranch main
+RUN git config --global pull.rebase false
 COPY files/ssh_config /home/$USER/.ssh/config
 RUN curl -s https://packagecloud.io/install/repositories/github/git-lfs/script.deb.sh | sudo bash
 RUN sudo apt install -y git-lfs
