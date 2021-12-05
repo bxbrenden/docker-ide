@@ -26,22 +26,14 @@ RUN sudo apt install --no-install-recommends -y make build-essential libssl-dev 
                                                 libsqlite3-dev wget curl llvm libncursesw5-dev xz-utils tk-dev\
                                                 libxml2-dev libxmlsec1-dev libffi-dev liblzma-dev
 RUN curl https://pyenv.run | bash
-RUN /home/$USER/.pyenv/bin/pyenv install 3.8.12
 RUN /home/$USER/.pyenv/bin/pyenv install 3.9.8
-RUN /home/$USER/.pyenv/bin/pyenv global 3.8.12
 RUN echo 'eval "$(pyenv init --path)"' >> /home/$USER/.zshrc
 RUN echo 'eval "$(pyenv virtualenv-init -)"' >> /home/$USER/.zshrc
 
-#Install top-level Python 3.8 deps and packages that are just easiest to manage via pip
-RUN /home/$USER/.pyenv/shims/pip3 install pipenv black imgcat requests ipython flake8 ansible\
-                                          yamllint redis jupyter "ansible-lint[community,yamllint]"
 #Install top-level Python 3.9 deps and packages that are just easiest to manage via pip
 RUN /home/$USER/.pyenv/bin/pyenv global 3.9.8
 RUN /home/$USER/.pyenv/shims/pip3  install pipenv black imgcat requests ipython flake8 ansible\
                                           yamllint redis jupyter "ansible-lint[community,yamllint]"
-
-# Ensure Python3.9.8 as the default version
-RUN /home/$USER/.pyenv/bin/pyenv global 3.9.8
 
 # switch back to root for a while
 USER root
@@ -85,22 +77,11 @@ RUN curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2
 RUN unzip awscliv2.zip
 RUN ./aws/install
 
-#AWS CDK (CloudFormation Development Kit)
-RUN npm install -g aws-cdk
-
-#Terragrunt
-RUN wget https://github.com/gruntwork-io/terragrunt/releases/download/v0.35.4/terragrunt_linux_amd64
-RUN chmod a+x $SOFTWARE_DIR/terragrunt_linux_amd64
-RUN ln -s $SOFTWARE_DIR/terragrunt_linux_amd64 /usr/local/bin/terragrunt
-
 ##Make the utilities usable
 RUN chown -R $USER:$USER $SOFTWARE_DIR
 
 #Do last few things as USER
 USER $USER
-
-#Install Angular
-RUN npm install -g @angular/cli
 
 #Configure git client
 ARG GIT_EMAIL
