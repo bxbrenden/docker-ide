@@ -5,7 +5,8 @@ USER root
 RUN apt update && apt install --no-install-recommends -y zsh man file sudo bc vim-nox telnet unzip xz-utils\
 				curl wget git less procps net-tools dnsutils netcat pwgen openjdk-11-jdk\
 				openssh-client traceroute postgresql-client default-mysql-client zip units\
-                                wait-for-it redis tmux screen tree iproute2 iputils-ping
+                                wait-for-it redis tmux screen tree iproute2 iputils-ping \
+    && rm -rf /var/lib/apt/lists/*
 
 #Set to Pacific Time
 ENV TZ=America/Los_Angeles
@@ -22,9 +23,11 @@ COPY files/sudoers /etc/sudoers
 USER $USER
 
 #Install pyenv and set global python interpreter
-RUN sudo apt install --no-install-recommends -y make build-essential libssl-dev zlib1g-dev libbz2-dev libreadline-dev\
-                                                libsqlite3-dev wget curl llvm libncursesw5-dev xz-utils tk-dev\
-                                                libxml2-dev libxmlsec1-dev libffi-dev liblzma-dev
+RUN sudo apt update && sudo apt install --no-install-recommends -y make build-essential libssl-dev zlib1g-dev \
+                                                libbz2-dev libreadline-dev libsqlite3-dev \
+                                                wget curl llvm libncursesw5-dev xz-utils tk-dev\
+                                                libxml2-dev libxmlsec1-dev libffi-dev liblzma-dev \
+    && sudo rm -rf /var/lib/apt/lists/*
 RUN curl https://pyenv.run | bash
 RUN /home/$USER/.pyenv/bin/pyenv install 3.9.8
 RUN echo 'eval "$(pyenv init --path)"' >> /home/$USER/.zshrc
@@ -60,12 +63,14 @@ RUN unzip terraform_1.0.8_linux_amd64.zip
 RUN ln -s $SOFTWARE_DIR/terraform /usr/local/bin/terraform
 
 #Docker
-RUN apt install -y --no-install-recommends apt-transport-https ca-certificates gnupg lsb-release
+RUN apt update && apt install -y --no-install-recommends apt-transport-https ca-certificates gnupg lsb-release \
+    && rm -rf /var/lib/apt/lists/*
 RUN curl -fsSL https://download.docker.com/linux/debian/gpg | gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
 RUN echo \
   "deb [arch=amd64 signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/debian \
   $(lsb_release -cs) stable" | tee /etc/apt/sources.list.d/docker.list > /dev/null
-RUN apt update && apt install -y --no-install-recommends docker-ce docker-ce-cli containerd.io
+RUN apt update && apt install -y --no-install-recommends docker-ce docker-ce-cli containerd.io \
+    && rm -rf /var/lib/apt/lists/*
 RUN usermod -aG docker $USER
 
 #Docker-Compose
@@ -92,7 +97,7 @@ RUN git config --global init.defaultBranch main
 RUN git config --global pull.rebase false
 COPY files/ssh_config /home/$USER/.ssh/config
 RUN curl -s https://packagecloud.io/install/repositories/github/git-lfs/script.deb.sh | sudo bash
-RUN sudo apt install -y git-lfs
+RUN sudo apt update && sudo apt install -y git-lfs && sudo rm -rf /var/lib/apt/lists/*
 RUN git lfs install
 
 #Set up flake8
