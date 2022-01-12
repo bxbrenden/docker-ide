@@ -103,7 +103,7 @@ source $ZSH/oh-my-zsh.sh
 #
 # PATH
 # node.js in path
-export PATH=$PATH:/home/brenden/Software/node-v14.18.1-linux-x64/bin
+export PATH=$PATH:/home/brenden/Software/node-v14.18.2-linux-x64/bin
 # pyenv in path
 export PATH=/home/brenden/.pyenv/bin:$PATH
 export PATH=/home/brenden/.pyenv/shims:$PATH
@@ -125,6 +125,7 @@ alias sshc="vim ~/.ssh/config"
 # git
 alias gdom="git diff origin/master"
 alias gdm="git diff master"
+alias gruop="git remote update origin --prune"
 
 # apt
 alias aud="sudo apt update"

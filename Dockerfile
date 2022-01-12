@@ -1,11 +1,11 @@
-FROM debian:bullseye-20211011
+FROM debian:bullseye-20211220
 USER root
 
 #Install basic utilities
-RUN apt update && apt install --no-install-recommends -y zsh man file sudo bc vim-nox telnet unzip xz-utils\
-				curl wget git less procps net-tools dnsutils netcat pwgen openjdk-11-jdk\
+RUN apt update && apt install --no-install-recommends -y zsh bat man exa file sudo bc vim-nox telnet unzip xz-utils\
+				curl wget git less procps net-tools dnsutils netcat pwgen \
 				openssh-client traceroute postgresql-client default-mysql-client zip units\
-                                wait-for-it redis tmux screen tree iproute2 iputils-ping \
+                                wait-for-it tmux screen tree iproute2 iputils-ping \
     && rm -rf /var/lib/apt/lists/*
 
 #Set to Pacific Time
@@ -29,12 +29,12 @@ RUN sudo apt update && sudo apt install --no-install-recommends -y make build-es
                                                 libxml2-dev libxmlsec1-dev libffi-dev liblzma-dev \
     && sudo rm -rf /var/lib/apt/lists/*
 RUN curl https://pyenv.run | bash
-RUN /home/$USER/.pyenv/bin/pyenv install 3.9.8
+RUN /home/$USER/.pyenv/bin/pyenv install 3.9.9
 RUN echo 'eval "$(pyenv init --path)"' >> /home/$USER/.zshrc
 RUN echo 'eval "$(pyenv virtualenv-init -)"' >> /home/$USER/.zshrc
 
 #Install top-level Python 3.9 deps and packages that are just easiest to manage via pip
-RUN /home/$USER/.pyenv/bin/pyenv global 3.9.8
+RUN /home/$USER/.pyenv/bin/pyenv global 3.9.9
 RUN /home/$USER/.pyenv/shims/pip3  install pipenv black imgcat requests ipython flake8 ansible\
                                           yamllint redis jupyter "ansible-lint[community,yamllint]"
 
@@ -46,21 +46,15 @@ ENV SOFTWARE_DIR /home/$USER/Software
 RUN mkdir $SOFTWARE_DIR
 WORKDIR $SOFTWARE_DIR
 
-##ccat
-RUN wget https://github.com/jingweno/ccat/releases/download/v1.1.0/linux-amd64-1.1.0.tar.gz
-RUN tar xvf linux-amd64-1.1.0.tar.gz
-RUN ln -s "$SOFTWARE_DIR/linux-amd64-1.1.0/ccat" /usr/local/bin/ccat
-RUN rm linux-amd64-1.1.0.tar.gz
+## node.js
+RUN wget https://nodejs.org/dist/v14.18.2/node-v14.18.2-linux-x64.tar.xz
+RUN wget https://nodejs.org/dist/v14.18.2/node-v14.18.2-linux-x64.tar.xz
+RUN tar xvf $SOFTWARE_DIR/node-v14.18.2-linux-x64.tar.xz
+RUN ln -s $SOFTWARE_DIR/node-v14.18.2-linux-x64/bin/* /usr/local/bin
 
-##node.js
-RUN wget https://nodejs.org/dist/v14.18.1/node-v14.18.1-linux-x64.tar.xz
-RUN tar xvf $SOFTWARE_DIR/node-v14.18.1-linux-x64.tar.xz
-RUN ln -s $SOFTWARE_DIR/node-v14.18.1-linux-x64/bin/* /usr/local/bin
-
-##Terraform
-RUN wget https://releases.hashicorp.com/terraform/1.0.8/terraform_1.0.8_linux_amd64.zip
-RUN unzip terraform_1.0.8_linux_amd64.zip
-RUN ln -s $SOFTWARE_DIR/terraform /usr/local/bin/terraform
+# Typescript, NextJS, fx
+RUN /usr/local/bin/npm install -g typescript @nestjs/cli fx diff-so-fancy yarn
+RUN ln -s $SOFTWARE_DIR/node-v14.18.2-linux-x64/bin/yarn /usr/local/bin/
 
 #Docker
 RUN apt update && apt install -y --no-install-recommends apt-transport-https ca-certificates gnupg lsb-release \
@@ -113,6 +107,9 @@ RUN sudo chown -R $USER:$USER /home/$USER/.vim*
 ENV VIMRC="/home/$USER/.vimrc"
 RUN sudo update-alternatives --set editor /usr/bin/vim.nox
 RUN vim +PluginInstall +qall
+WORKDIR /home/$USER/.vim/bundle/coc.nvim
+RUN /usr/local/bin/yarn install && /usr/local/bin/yarn build
+# RUN vim +PluginInstall +qall
 RUN echo "colorscheme medic_chalk" >> $VIMRC
 RUN echo "set background=dark" >> $VIMRC
 RUN echo '" show unnecessary whitespace as red' >> $VIMRC
