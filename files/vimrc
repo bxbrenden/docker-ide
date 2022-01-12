@@ -26,6 +26,10 @@ Plugin 'nvie/vim-flake8'
 Plugin 'ledger/vim-ledger'
 Plugin 'ParamagicDev/vim-medic_chalk'
 Plugin 'jvirtanen/vim-hcl'
+Plugin 'neoclide/coc.nvim', {'branch': 'master', 'do': 'yarn install --frozen-lockfile'}
+
+" CoC extensions
+let g:coc_global_extensions = ['coc-tsserver']
 
 " All of your Plugins must be added before the following line
 call vundle#end()            " required
