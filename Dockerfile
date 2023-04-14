@@ -1,16 +1,13 @@
-FROM debian:bullseye-20211220
+FROM debian:bookworm-20230411
+LABEL org.opencontainers.image.authors="brendenahyde@gmail.com"
 USER root
 
-#Install basic utilities
-RUN apt update && apt install --no-install-recommends -y zsh bat man exa file sudo bc vim-nox telnet unzip xz-utils\
-				curl wget git less procps net-tools dnsutils netcat pwgen \
-				openssh-client traceroute postgresql-client default-mysql-client zip units\
-                                wait-for-it tmux screen tree iproute2 iputils-ping \
-    && rm -rf /var/lib/apt/lists/*
-
-#Set to Pacific Time
-ENV TZ=America/Los_Angeles
-RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
+# Get my base packages and delete the apt cache
+RUN apt update && apt install --no-install-recommends -y \
+  git curl wget zsh vim-nox net-tools procps less man file tree apt-file\
+  ca-certificates telnet netcat-openbsd unzip xz-utils net-tools dnsutils pwgen \
+  openssh-client traceroute iproute2 iputils-ping tmux screen sudo bc \
+  && rm -rf /var/lib/apt/lists/*
 
 #Create non-root user
 ARG USER
@@ -19,67 +16,53 @@ RUN useradd -m -s /usr/bin/zsh -G sudo "$USER"
 RUN /bin/bash -c "echo -e \"$PASSWD\n$PASSWD\" | passwd \"$USER\""
 COPY files/sudoers /etc/sudoers
 
-# Become non-root user for pyenv install only
+# Become non-root user for pyenv install and home dir config
 USER $USER
 
 #Install pyenv and set global python interpreter
-RUN sudo apt update && sudo apt install --no-install-recommends -y make build-essential libssl-dev zlib1g-dev \
-                                                libbz2-dev libreadline-dev libsqlite3-dev \
-                                                wget curl llvm libncursesw5-dev xz-utils tk-dev\
-                                                libxml2-dev libxmlsec1-dev libffi-dev liblzma-dev \
-    && sudo rm -rf /var/lib/apt/lists/*
+ARG PYTHON_VERSION
+RUN sudo apt update && sudo apt install --no-install-recommends -y \
+  make build-essential libssl-dev zlib1g-dev \
+  libbz2-dev libreadline-dev libsqlite3-dev \
+  wget curl llvm libncursesw5-dev xz-utils tk-dev\
+  libxml2-dev libxmlsec1-dev libffi-dev liblzma-dev \
+  && sudo rm -rf /var/lib/apt/lists/*
+
 RUN curl https://pyenv.run | bash
-RUN /home/$USER/.pyenv/bin/pyenv install 3.9.9
+RUN /home/$USER/.pyenv/bin/pyenv install $PYTHON_VERSION
 RUN echo 'eval "$(pyenv init --path)"' >> /home/$USER/.zshrc
 RUN echo 'eval "$(pyenv virtualenv-init -)"' >> /home/$USER/.zshrc
+RUN /home/$USER/.pyenv/bin/pyenv global $PYTHON_VERSION
 
-#Install top-level Python 3.9 deps and packages that are just easiest to manage via pip
-RUN /home/$USER/.pyenv/bin/pyenv global 3.9.9
-RUN /home/$USER/.pyenv/shims/pip3  install pipenv black imgcat requests ipython flake8 ansible\
-                                          yamllint redis jupyter "ansible-lint[community,yamllint]"
+# Home directories
+ENV USER_HOME /home/$USER/
+RUN ["/bin/bash", "-c", "mkdir -p $USER_HOME/{Software,git,Downloads,Documents}"]
 
-# switch back to root for a while
+# Become root again to continue configuring
 USER root
 
-#Extra utilities
-ENV SOFTWARE_DIR /home/$USER/Software
-RUN mkdir $SOFTWARE_DIR
-WORKDIR $SOFTWARE_DIR
-
-## node.js
-RUN wget https://nodejs.org/dist/v14.18.2/node-v14.18.2-linux-x64.tar.xz
-RUN wget https://nodejs.org/dist/v14.18.2/node-v14.18.2-linux-x64.tar.xz
-RUN tar xvf $SOFTWARE_DIR/node-v14.18.2-linux-x64.tar.xz
-RUN ln -s $SOFTWARE_DIR/node-v14.18.2-linux-x64/bin/* /usr/local/bin
-
-# Typescript, NextJS, fx
-RUN /usr/local/bin/npm install -g typescript @nestjs/cli fx diff-so-fancy yarn
-RUN ln -s $SOFTWARE_DIR/node-v14.18.2-linux-x64/bin/yarn /usr/local/bin/
+#Set to Pacific Time
+ENV TZ=America/Los_Angeles
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
 #Docker
-RUN apt update && apt install -y --no-install-recommends apt-transport-https ca-certificates gnupg lsb-release \
-    && rm -rf /var/lib/apt/lists/*
-RUN curl -fsSL https://download.docker.com/linux/debian/gpg | gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
+RUN apt update && apt install -y --no-install-recommends gnupg && rm -rf /var/lib/apt/lists/*
+RUN install -m 0755 -d /etc/apt/keyrings
+RUN curl -fsSL https://download.docker.com/linux/debian/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+RUN chmod a+r /etc/apt/keyrings/docker.gpg
 RUN echo \
-  "deb [arch=amd64 signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/debian \
-  $(lsb_release -cs) stable" | tee /etc/apt/sources.list.d/docker.list > /dev/null
-RUN apt update && apt install -y --no-install-recommends docker-ce docker-ce-cli containerd.io \
-    && rm -rf /var/lib/apt/lists/*
+  "deb [arch="$(dpkg --print-architecture)" signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/debian \
+  "$(. /etc/os-release && echo "$VERSION_CODENAME")" stable" | \
+  tee /etc/apt/sources.list.d/docker.list > /dev/null
+RUN apt update && apt install --no-install-recommends -y \
+  docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin \
+  && rm -rf /var/lib/apt/lists/*
 RUN usermod -aG docker $USER
 
 #Docker-Compose
 RUN curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
 RUN chmod +x /usr/local/bin/docker-compose
 
-#AWS CLI
-RUN curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
-RUN unzip awscliv2.zip
-RUN ./aws/install
-
-##Make the utilities usable
-RUN chown -R $USER:$USER $SOFTWARE_DIR
-
-#Do last few things as USER
 USER $USER
 
 #Configure git client
@@ -89,14 +72,8 @@ RUN git config --global user.email "$GIT_EMAIL"
 RUN git config --global user.name "$GIT_USER"
 RUN git config --global init.defaultBranch main
 RUN git config --global pull.rebase false
-COPY files/ssh_config /home/$USER/.ssh/config
-RUN curl -s https://packagecloud.io/install/repositories/github/git-lfs/script.deb.sh | sudo bash
 RUN sudo apt update && sudo apt install -y git-lfs && sudo rm -rf /var/lib/apt/lists/*
 RUN git lfs install
-
-#Set up flake8
-RUN mkdir -p /home/$USER/.config
-COPY files/flake8 /home/$USER/.config/flake8
 
 #Configure vim
 COPY files/vimrc /home/$USER/.vimrc
@@ -107,23 +84,15 @@ RUN sudo chown -R $USER:$USER /home/$USER/.vim*
 ENV VIMRC="/home/$USER/.vimrc"
 RUN sudo update-alternatives --set editor /usr/bin/vim.nox
 RUN vim +PluginInstall +qall
-WORKDIR /home/$USER/.vim/bundle/coc.nvim
-RUN /usr/local/bin/yarn install && /usr/local/bin/yarn build
-# RUN vim +PluginInstall +qall
 RUN echo "colorscheme medic_chalk" >> $VIMRC
 RUN echo "set background=dark" >> $VIMRC
-RUN echo '" show unnecessary whitespace as red' >> $VIMRC
-RUN echo "highlight BadWhitespace ctermbg=red guibg=darkred" >> $VIMRC
-RUN echo 'au BufRead,BufNewFile * match BadWhitespace /\s\+$/' >> $VIMRC
+# RUN echo '" show unnecessary whitespace as red' >> $VIMRC
+# RUN echo "highlight BadWhitespace ctermbg=red guibg=darkred" >> $VIMRC
+# RUN echo 'au BufRead,BufNewFile * match BadWhitespace /\s\+$/' >> $VIMRC
 WORKDIR /home/$USER
 
 #Install and configure oh-my-zsh
-RUN sudo sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+RUN sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
 COPY files/zshrc /root/.zshrc
 COPY files/zshrc /home/$USER/.zshrc
 RUN sudo chown $USER:$USER /home/$USER/.zshrc
-# node.js in path
-RUN echo "export PATH=\$PATH:/home/$USER/Software/node-v16.9.0-linux-x64/bin" >> /home/$USER/.zshrc
-# pyenv in path
-RUN echo "export PATH=\$PATH:/home/$USER/.pyenv/bin/" >> /home/$USER/.zshrc
-RUN sudo chmod 755 /root

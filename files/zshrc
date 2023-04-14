@@ -3,13 +3,13 @@
 export USER=brenden
 
 # Path to your oh-my-zsh installation.
-export ZSH="/root/.oh-my-zsh"
+export ZSH="/home/brenden/.oh-my-zsh"
 
 # Set name of the theme to load --- if set to "random", it will
 # load a random theme each time oh-my-zsh is loaded, in which case,
 # to know which specific one was loaded, run: echo $RANDOM_THEME
 # See https://github.com/ohmyzsh/ohmyzsh/wiki/Themes
-ZSH_THEME="junkfood"
+ZSH_THEME="linuxonly"
 
 # Set list of themes to pick from when loading at random
 # Setting this variable when ZSH_THEME=random will cause zsh to load
@@ -101,12 +101,12 @@ source $ZSH/oh-my-zsh.sh
 # alias zshconfig="mate ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
 #
-# PATH
-# node.js in path
-export PATH=$PATH:/home/brenden/Software/node-v14.18.2-linux-x64/bin
+
 # pyenv in path
 export PATH=/home/brenden/.pyenv/bin:$PATH
 export PATH=/home/brenden/.pyenv/shims:$PATH
+export PATH=/home/brenden/.pyenv/versions/3.11.1/bin:$PATH
+export PATH=/home/brenden/.local/bin/:$PATH
 
 # zsh
 alias zrc="vim ~/.zshrc"
@@ -116,16 +116,14 @@ alias szrc="source ~/.zshrc"
 alias cl="clear"
 alias grni="grep -rni"
 alias ap="ansible-playbook"
-alias tf="terraform"
 
 # edit dotfiles
 alias vrc="vim ~/.vimrc"
 alias sshc="vim ~/.ssh/config"
 
 # git
-alias gdom="git diff origin/master"
-alias gdm="git diff master"
-alias gruop="git remote update origin --prune"
+alias gdom="git diff origin/main"
+alias gdm="git diff main"
 
 # apt
 alias aud="sudo apt update"
@@ -135,17 +133,16 @@ alias ai="sudo apt install"
 alias aiy="sudo apt install -y"
 alias aps="sudo apt search"
 alias aall="aud && augy"
+alias alu="apt list --upgradable"
 
 # python
 alias py="python"
 alias py3="python3"
 alias ipy="ipython"
 alias calc="ipy -c"
-alias flr="flask run"
 
 # filesystem navigation
 alias cdg="cd ~/git"
-alias cdl="cd ~/git/LS"
 alias dwn="cd ~/Downloads"
 alias doc="cd ~/Documents"
 alias cds="cd ~/Software"
@@ -175,5 +172,18 @@ function math {
   echo "scale=2;$1" | bc -l
 }
 
-alias mkpass="pwgen -cynsB"
 alias clear="/usr/bin/clear -x"
+eval "$(pyenv init --path)"
+eval "$(pyenv virtualenv-init -)"
+
+# rust
+alias vsm="vim src/main.rs"
+alias vsl="vim src/lib.rs"
+alias cb="cargo build"
+alias cf="cargo fmt"
+alias cr="cargo run"
+alias ct="cargo test"
+
+# Misc
+alias copy="rsync -avh --progress"
+alias unz="unzip"

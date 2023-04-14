@@ -23,13 +23,8 @@ Plugin 'davidhalter/jedi-vim'
 Plugin 'tmhedberg/simpylfold'
 Plugin 'mattn/emmet-vim'
 Plugin 'nvie/vim-flake8'
-Plugin 'ledger/vim-ledger'
 Plugin 'ParamagicDev/vim-medic_chalk'
 Plugin 'jvirtanen/vim-hcl'
-Plugin 'neoclide/coc.nvim', {'branch': 'master', 'do': 'yarn install --frozen-lockfile'}
-
-" CoC extensions
-let g:coc_global_extensions = ['coc-tsserver']
 
 " All of your Plugins must be added before the following line
 call vundle#end()            " required
@@ -67,3 +62,12 @@ autocmd FileType yaml setlocal ts=2 sts=2 sw=2 expandtab
 
 " HTML
 autocmd FileType html setlocal ts=2 sts=2 sw=2 expandtab
+
+" JavaScript / JS
+autocmd FileType javascript setlocal ts=2 sts=2 sw=2 expandtab
+
+set background=dark
+
+"show unnecessary whitespace as red
+highlight BadWhitespace ctermbg=red guibg=darkred
+au BufRead,BufNewFile * match BadWhitespace /\s\+$/
