@@ -30,7 +30,7 @@ An example build command is:
 docker build --build-arg "USER=brenden" \
              --build-arg "PASSWD=$DOCKER_IDE_PASS" \
              --build-arg "PYTHON_VERSION=3.11.3" \
-             --build-arg "GIT_EMAIL=brenden@example.com"
-             --build-arg "GIT_USER='Brenden Hyde'"
+             --build-arg "GIT_EMAIL=brenden@example.com" \
+             --build-arg "GIT_USER='Brenden Hyde'" \
              -t bxbrenden/docker-ide:2023-04-14 .
 ```

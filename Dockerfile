@@ -4,22 +4,22 @@ USER root
 
 # Get my base packages and delete the apt cache
 RUN apt update && apt install --no-install-recommends -y \
-  git curl wget zsh vim-nox net-tools procps less man file tree apt-file\
+  git bat curl wget zsh vim-nox net-tools procps less man file tree apt-file\
   ca-certificates telnet netcat-openbsd unzip xz-utils net-tools dnsutils pwgen \
   openssh-client traceroute iproute2 iputils-ping tmux screen sudo bc \
   && rm -rf /var/lib/apt/lists/*
 
-#Create non-root user
+# Create non-root user
 ARG USER
 ARG PASSWD
-RUN useradd -m -s /usr/bin/zsh -G sudo "$USER"
+RUN useradd -u 501 -m -s /usr/bin/zsh -G sudo "$USER"
 RUN /bin/bash -c "echo -e \"$PASSWD\n$PASSWD\" | passwd \"$USER\""
 COPY files/sudoers /etc/sudoers
 
 # Become non-root user for pyenv install and home dir config
 USER $USER
 
-#Install pyenv and set global python interpreter
+# Install pyenv and set global python interpreter
 ARG PYTHON_VERSION
 RUN sudo apt update && sudo apt install --no-install-recommends -y \
   make build-essential libssl-dev zlib1g-dev \
@@ -41,11 +41,11 @@ RUN ["/bin/bash", "-c", "mkdir -p $USER_HOME/{Software,git,Downloads,Documents}"
 # Become root again to continue configuring
 USER root
 
-#Set to Pacific Time
+# Set to Pacific Time
 ENV TZ=America/Los_Angeles
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
-#Docker
+# Docker
 RUN apt update && apt install -y --no-install-recommends gnupg && rm -rf /var/lib/apt/lists/*
 RUN install -m 0755 -d /etc/apt/keyrings
 RUN curl -fsSL https://download.docker.com/linux/debian/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
@@ -59,13 +59,13 @@ RUN apt update && apt install --no-install-recommends -y \
   && rm -rf /var/lib/apt/lists/*
 RUN usermod -aG docker $USER
 
-#Docker-Compose
+# Docker-Compose
 RUN curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
 RUN chmod +x /usr/local/bin/docker-compose
 
 USER $USER
 
-#Configure git client
+# Configure git client
 ARG GIT_EMAIL
 ARG GIT_USER
 RUN git config --global user.email "$GIT_EMAIL"
@@ -75,7 +75,7 @@ RUN git config --global pull.rebase false
 RUN sudo apt update && sudo apt install -y git-lfs && sudo rm -rf /var/lib/apt/lists/*
 RUN git lfs install
 
-#Configure vim
+# Configure vim
 COPY files/vimrc /home/$USER/.vimrc
 RUN mkdir /home/$USER/.vim
 RUN git clone https://github.com/VundleVim/Vundle.vim.git /home/$USER/.vim/bundle/Vundle.vim
@@ -91,8 +91,12 @@ RUN echo "set background=dark" >> $VIMRC
 # RUN echo 'au BufRead,BufNewFile * match BadWhitespace /\s\+$/' >> $VIMRC
 WORKDIR /home/$USER
 
-#Install and configure oh-my-zsh
+# Install and configure oh-my-zsh
 RUN sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
 COPY files/zshrc /root/.zshrc
 COPY files/zshrc /home/$USER/.zshrc
 RUN sudo chown $USER:$USER /home/$USER/.zshrc
+
+# Install some Python packages I use often and upgrade pip
+RUN /home/$USER/.pyenv/versions/$PYTHON_VERSION/bin/pip install --upgrade pip
+RUN /home/$USER/.pyenv/versions/$PYTHON_VERSION/bin/pip install ansible black ipython requests flake8 pipenv

@@ -124,6 +124,7 @@ alias sshc="vim ~/.ssh/config"
 # git
 alias gdom="git diff origin/main"
 alias gdm="git diff main"
+alias safegit='git config --global --add safe.directory "$(pwd)"'
 
 # apt
 alias aud="sudo apt update"
