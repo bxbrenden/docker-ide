@@ -100,3 +100,22 @@ RUN sudo chown $USER:$USER /home/$USER/.zshrc
 # Install some Python packages I use often and upgrade pip
 RUN /home/$USER/.pyenv/versions/$PYTHON_VERSION/bin/pip install --upgrade pip
 RUN /home/$USER/.pyenv/versions/$PYTHON_VERSION/bin/pip install ansible black ipython requests flake8 pipenv
+
+# # Clone and compile distrobuilder (this probably won't actually work)
+# RUN sudo apt update && sudo apt install --no-install-recommends -y \
+#   golang-go debootstrap rsync squashfs-tools \
+#   && sudo rm -rf /var/lib/apt/lists/*
+# WORKDIR /home/$USER/git
+# RUN git clone https://github.com/lxc/distrobuilder
+# WORKDIR distrobuilder
+# RUN make
+# RUN sudo ln -s /home/$USER/go/bin/distrobuilder /usr/local/bin/distrobuilder
+# WORKDIR /home/$USER
+# RUN rm -rf /home/$USER/git/distrobuilder
+
+# Install Google Cloud CLI tool
+RUN sudo apt update && sudo apt install --no-install-recommends -y python3 apt-transport-https \
+  && sudo rm -rf /var/lib/apt/lists/*
+Run echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] https://packages.cloud.google.com/apt cloud-sdk main" | sudo tee -a /etc/apt/sources.list.d/google-cloud-sdk.list
+RUN curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo tee /usr/share/keyrings/cloud.google.gpg
+RUN sudo apt update && sudo apt install --no-install-recommends -y google-cloud-cli && sudo rm -rf /var/lib/apt/lists/*
