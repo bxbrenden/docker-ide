@@ -25,7 +25,7 @@ The `Dockerfile` requires the following build args:
 - `GIT_USER`: the firstname-lastname string for git user, e.g. "Brenden Hyde"
 - `GIT_EMAIL`: the email address that'll be used in git commits for attribution
 
-Example set of build commands:
+Example set of build commands for macOS on M1 or M2 processor:
 ```bash
 export DOCKER_IDE_PASS=dummy
 docker build --build-arg "USER=brenden" \
@@ -33,5 +33,16 @@ docker build --build-arg "USER=brenden" \
              --build-arg "PYTHON_VERSION=3.11.3" \
              --build-arg "GIT_EMAIL=brendenahyde@gmail.com" \
              --build-arg "GIT_USER='Brenden Hyde'" \
-             -t bxbrenden/docker-ide:2023-04-17 .
+             -t bxbrenden/docker-ide:2023-04-21-aarch64 .
+```
+
+Example set of build commands for Linux on amd64 / x86_64:
+```bash
+export DOCKER_IDE_PASS=dummy
+docker build --build-arg "USER=brenden" \
+             --build-arg "PASSWD=$DOCKER_IDE_PASS" \
+             --build-arg "PYTHON_VERSION=3.11.3" \
+             --build-arg "GIT_EMAIL=brendenahyde@gmail.com" \
+             --build-arg "GIT_USER='Brenden Hyde'" \
+             -t bxbrenden/docker-ide:2023-04-21-amd64 .
 ```
