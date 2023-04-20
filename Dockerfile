@@ -12,7 +12,7 @@ RUN apt update && apt install --no-install-recommends -y \
 # Create non-root user
 ARG USER
 ARG PASSWD
-RUN useradd -u 501 -m -s /usr/bin/zsh -G sudo "$USER"
+RUN useradd -u 1000 -m -s /usr/bin/zsh -G sudo "$USER"
 RUN /bin/bash -c "echo -e \"$PASSWD\n$PASSWD\" | passwd \"$USER\""
 COPY files/sudoers /etc/sudoers
 
