@@ -126,3 +126,15 @@ RUN sudo apt update && sudo apt install -y awscli && sudo rm -rf /var/lib/apt/li
 # Install Pulumi
 RUN curl -fsSL https://get.pulumi.com | sh
 RUN echo "export PATH=\$PATH:/home/$USER/.pulumi/bin" >> /home/$USER/.zshrc
+
+# Install kubectl
+RUN sudo curl -fsSLo /etc/apt/keyrings/kubernetes-archive-keyring.gpg https://packages.cloud.google.com/apt/doc/apt-key.gpg
+RUN echo "deb [signed-by=/etc/apt/keyrings/kubernetes-archive-keyring.gpg] https://apt.kubernetes.io/ kubernetes-xenial main" | sudo tee /etc/apt/sources.list.d/kubernetes.list
+RUN sudo apt update && sudo apt install --no-install-recommends -y kubectl && sudo rm -rf /var/lib/apt/lists/*
+
+# Install Helm
+RUN curl https://baltocdn.com/helm/signing.asc | gpg --dearmor | sudo tee /usr/share/keyrings/helm.gpg > /dev/null
+RUN sudo apt update && sudo apt install -y --no-install-recommends apt-transport-https \
+  && sudo rm -rf /var/lib/apt/lists/*
+RUN echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/helm.gpg] https://baltocdn.com/helm/stable/debian/ all main" | sudo tee /etc/apt/sources.list.d/helm-stable-debian.list
+RUN sudo apt update && sudo apt install -y --no-install-recommends helm && sudo rm -rf /var/lib/apt/lists/*
