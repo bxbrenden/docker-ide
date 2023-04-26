@@ -168,6 +168,9 @@ alias dcd="docker-compose up -d"
 alias dcua="docker-compose up --abort-on-container-exit"
 alias docksock="sudo chmod a+w /var/run/docker.sock"
 
+# Kubernetes
+alias k="kubectl"
+
 # math
 function math {
   echo "scale=2;$1" | bc -l
