@@ -33,5 +33,5 @@ docker build --build-arg "USER=brenden" \
              --build-arg "PYTHON_VERSION=3.11.3" \
              --build-arg "GIT_EMAIL=brendenahyde@gmail.com" \
              --build-arg "GIT_USER='Brenden Hyde'" \
-             -t bxbrenden/docker-ide:2023-04-17 .
+             -t bxbrenden/docker-ide:$(date --rfc-3339=date) .
 ```
