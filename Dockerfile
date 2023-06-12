@@ -1,4 +1,4 @@
-FROM debian:bookworm-20230411
+FROM debian:bookworm-20230522
 LABEL org.opencontainers.image.authors="brendenahyde@gmail.com"
 USER root
 
@@ -30,6 +30,8 @@ RUN sudo apt update && sudo apt install --no-install-recommends -y \
 
 RUN curl https://pyenv.run | bash
 RUN /home/$USER/.pyenv/bin/pyenv install $PYTHON_VERSION
+# Tech Debt: hard-code a Python 3.9.16 install
+RUN /home/$USER/.pyenv/bin/pyenv install 3.9.16
 RUN echo 'eval "$(pyenv init --path)"' >> /home/$USER/.zshrc
 RUN echo 'eval "$(pyenv virtualenv-init -)"' >> /home/$USER/.zshrc
 RUN /home/$USER/.pyenv/bin/pyenv global $PYTHON_VERSION
@@ -84,7 +86,8 @@ RUN sudo chown -R $USER:$USER /home/$USER/.vim*
 ENV VIMRC="/home/$USER/.vimrc"
 RUN sudo update-alternatives --set editor /usr/bin/vim.nox
 RUN vim +PluginInstall +qall
-RUN echo "colorscheme medic_chalk" >> $VIMRC
+RUN echo "colorscheme seoul256" >> $VIMRC
+RUN echo "let g:seoul256_background = 233" >> $VIMRC
 RUN echo "set background=dark" >> $VIMRC
 # RUN echo '" show unnecessary whitespace as red' >> $VIMRC
 # RUN echo "highlight BadWhitespace ctermbg=red guibg=darkred" >> $VIMRC
@@ -113,12 +116,12 @@ RUN sudo ln -s /home/$USER/go/bin/distrobuilder /usr/local/bin/distrobuilder
 WORKDIR /home/$USER
 RUN rm -rf /home/$USER/git/distrobuilder
 
-# Install Google Cloud CLI tool
-RUN sudo apt update && sudo apt install --no-install-recommends -y python3 apt-transport-https \
-  && sudo rm -rf /var/lib/apt/lists/*
-Run echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] https://packages.cloud.google.com/apt cloud-sdk main" | sudo tee -a /etc/apt/sources.list.d/google-cloud-sdk.list
-RUN curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo tee /usr/share/keyrings/cloud.google.gpg
-RUN sudo apt update && sudo apt install --no-install-recommends -y google-cloud-cli && sudo rm -rf /var/lib/apt/lists/*
+# # Install Google Cloud CLI tool
+# RUN sudo apt update && sudo apt install --no-install-recommends -y python3 apt-transport-https \
+#   && sudo rm -rf /var/lib/apt/lists/*
+# Run echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] https://packages.cloud.google.com/apt cloud-sdk main" | sudo tee -a /etc/apt/sources.list.d/google-cloud-sdk.list
+# RUN curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo tee /usr/share/keyrings/cloud.google.gpg
+# RUN sudo apt update && sudo apt install --no-install-recommends -y google-cloud-cli && sudo rm -rf /var/lib/apt/lists/*
 
 # Install AWS CLI
 RUN sudo apt update && sudo apt install -y awscli && sudo rm -rf /var/lib/apt/lists/*
@@ -127,10 +130,10 @@ RUN sudo apt update && sudo apt install -y awscli && sudo rm -rf /var/lib/apt/li
 RUN curl -fsSL https://get.pulumi.com | sh
 RUN echo "export PATH=\$PATH:/home/$USER/.pulumi/bin" >> /home/$USER/.zshrc
 
-# Install kubectl
-RUN sudo curl -fsSLo /etc/apt/keyrings/kubernetes-archive-keyring.gpg https://packages.cloud.google.com/apt/doc/apt-key.gpg
-RUN echo "deb [signed-by=/etc/apt/keyrings/kubernetes-archive-keyring.gpg] https://apt.kubernetes.io/ kubernetes-xenial main" | sudo tee /etc/apt/sources.list.d/kubernetes.list
-RUN sudo apt update && sudo apt install --no-install-recommends -y kubectl && sudo rm -rf /var/lib/apt/lists/*
+# # Install kubectl
+# RUN sudo curl -fsSLo /etc/apt/keyrings/kubernetes-archive-keyring.gpg https://packages.cloud.google.com/apt/doc/apt-key.gpg
+# RUN echo "deb [signed-by=/etc/apt/keyrings/kubernetes-archive-keyring.gpg] https://apt.kubernetes.io/ kubernetes-xenial main" | sudo tee /etc/apt/sources.list.d/kubernetes.list
+# RUN sudo apt update && sudo apt install --no-install-recommends -y kubectl && sudo rm -rf /var/lib/apt/lists/*
 
 # Install Helm
 RUN curl https://baltocdn.com/helm/signing.asc | gpg --dearmor | sudo tee /usr/share/keyrings/helm.gpg > /dev/null
@@ -138,3 +141,9 @@ RUN sudo apt update && sudo apt install -y --no-install-recommends apt-transport
   && sudo rm -rf /var/lib/apt/lists/*
 RUN echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/helm.gpg] https://baltocdn.com/helm/stable/debian/ all main" | sudo tee /etc/apt/sources.list.d/helm-stable-debian.list
 RUN sudo apt update && sudo apt install -y --no-install-recommends helm && sudo rm -rf /var/lib/apt/lists/*
+
+# Install HashiCorp Vault CLI
+RUN wget -O- https://apt.releases.hashicorp.com/gpg | sudo gpg --dearmor -o /usr/share/keyrings/hashicorp-archive-keyring.gpg
+RUN echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/hashicorp.list
+# First install consistently fails, see https://github.com/hashicorp/vault/issues/10924#issuecomment-846123151
+RUN sudo apt update && sudo apt install -y vault && sudo apt install -y --reinstall vault && sudo rm -rf /var/lib/apt/lists/*
