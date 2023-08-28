@@ -105,7 +105,7 @@ source $ZSH/oh-my-zsh.sh
 # pyenv in path
 export PATH=/home/brenden/.pyenv/bin:$PATH
 export PATH=/home/brenden/.pyenv/shims:$PATH
-export PATH=/home/brenden/.pyenv/versions/3.11.1/bin:$PATH
+export PATH=/home/brenden/.pyenv/versions/3.11.4/bin:$PATH
 export PATH=/home/brenden/.local/bin/:$PATH
 
 # zsh
@@ -125,6 +125,8 @@ alias sshc="vim ~/.ssh/config"
 alias gdom="git diff origin/main"
 alias gdm="git diff main"
 alias safegit='git config --global --add safe.directory "$(pwd)"'
+alias gpot="git push origin --tag"
+alias gruop="git remote update origin --prune"
 
 # apt
 alias aud="sudo apt update"
@@ -141,6 +143,8 @@ alias py="python"
 alias py3="python3"
 alias ipy="ipython"
 alias calc="ipy -c"
+alias wp="which python"
+alias wp3="which python3"
 
 # filesystem navigation
 alias cdg="cd ~/git"
@@ -191,3 +195,4 @@ alias ct="cargo test"
 # Misc
 alias copy="rsync -avh --progress"
 alias unz="unzip"
+alias bat="batcat"

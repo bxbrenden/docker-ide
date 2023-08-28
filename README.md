@@ -30,7 +30,8 @@ Example set of build commands:
 export DOCKER_IDE_PASS=dummy
 docker build --build-arg "USER=brenden" \
              --build-arg "PASSWD=$DOCKER_IDE_PASS" \
-             --build-arg "PYTHON_VERSION=3.11.4" \
+             --build-arg "PYTHON_VERSION=3.11.5" \
+             --build-arg "PYTHON_OLD_VERSION=3.9.18" \
              --build-arg "GIT_EMAIL=brendenahyde@gmail.com" \
              --build-arg "GIT_USER='Brenden Hyde'" \
              -t bxbrenden/docker-ide:$(date --rfc-3339=date) .
@@ -41,7 +42,8 @@ export DOCKER_IDE_PASS=dummy
 docker build --no-cache \
              --build-arg "USER=brenden" \
              --build-arg "PASSWD=$DOCKER_IDE_PASS" \
-             --build-arg "PYTHON_VERSION=3.11.4" \
+             --build-arg "PYTHON_VERSION=3.11.5" \
+             --build-arg "PYTHON_OLD_VERSION=3.9.18" \
              --build-arg "GIT_EMAIL=brendenahyde@gmail.com" \
              --build-arg "GIT_USER='Brenden Hyde'" \
              -t bxbrenden/docker-ide:$(date --rfc-3339=date) .

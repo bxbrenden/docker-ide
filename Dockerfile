@@ -1,4 +1,4 @@
-FROM debian:bookworm-20230522
+FROM debian:bookworm-20230814
 LABEL org.opencontainers.image.authors="brendenahyde@gmail.com"
 USER root
 
@@ -30,8 +30,7 @@ RUN sudo apt update && sudo apt install --no-install-recommends -y \
 
 RUN curl https://pyenv.run | bash
 RUN /home/$USER/.pyenv/bin/pyenv install $PYTHON_VERSION
-# Tech Debt: hard-code a Python 3.9.16 install
-RUN /home/$USER/.pyenv/bin/pyenv install 3.9.16
+RUN /home/$USER/.pyenv/bin/pyenv install $PYTHON_OLD_VERSION
 RUN echo 'eval "$(pyenv init --path)"' >> /home/$USER/.zshrc
 RUN echo 'eval "$(pyenv virtualenv-init -)"' >> /home/$USER/.zshrc
 RUN /home/$USER/.pyenv/bin/pyenv global $PYTHON_VERSION
@@ -104,18 +103,6 @@ RUN sudo chown $USER:$USER /home/$USER/.zshrc
 RUN /home/$USER/.pyenv/versions/$PYTHON_VERSION/bin/pip install --upgrade pip
 RUN /home/$USER/.pyenv/versions/$PYTHON_VERSION/bin/pip install ansible black ipython requests flake8 pipenv
 
-# Clone and compile distrobuilder (this probably won't actually work)
-RUN sudo apt update && sudo apt install --no-install-recommends -y \
-  golang-go debootstrap rsync squashfs-tools \
-  && sudo rm -rf /var/lib/apt/lists/*
-WORKDIR /home/$USER/git
-RUN git clone https://github.com/lxc/distrobuilder
-WORKDIR distrobuilder
-RUN make
-RUN sudo ln -s /home/$USER/go/bin/distrobuilder /usr/local/bin/distrobuilder
-WORKDIR /home/$USER
-RUN rm -rf /home/$USER/git/distrobuilder
-
 # # Install Google Cloud CLI tool
 # RUN sudo apt update && sudo apt install --no-install-recommends -y python3 apt-transport-https \
 #   && sudo rm -rf /var/lib/apt/lists/*
@@ -130,10 +117,10 @@ RUN sudo apt update && sudo apt install -y awscli && sudo rm -rf /var/lib/apt/li
 RUN curl -fsSL https://get.pulumi.com | sh
 RUN echo "export PATH=\$PATH:/home/$USER/.pulumi/bin" >> /home/$USER/.zshrc
 
-# # Install kubectl
-# RUN sudo curl -fsSLo /etc/apt/keyrings/kubernetes-archive-keyring.gpg https://packages.cloud.google.com/apt/doc/apt-key.gpg
-# RUN echo "deb [signed-by=/etc/apt/keyrings/kubernetes-archive-keyring.gpg] https://apt.kubernetes.io/ kubernetes-xenial main" | sudo tee /etc/apt/sources.list.d/kubernetes.list
-# RUN sudo apt update && sudo apt install --no-install-recommends -y kubectl && sudo rm -rf /var/lib/apt/lists/*
+# Install kubectl
+RUN sudo curl -fsSL https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo gpg --dearmor -o /etc/apt/keyrings/kubernetes-archive-keyring.gpg
+RUN echo "deb [signed-by=/etc/apt/keyrings/kubernetes-archive-keyring.gpg] https://apt.kubernetes.io/ kubernetes-xenial main" | sudo tee /etc/apt/sources.list.d/kubernetes.list
+RUN sudo apt update && sudo apt install --no-install-recommends -y kubectl && sudo rm -rf /var/lib/apt/lists/*
 
 # Install Helm
 RUN curl https://baltocdn.com/helm/signing.asc | gpg --dearmor | sudo tee /usr/share/keyrings/helm.gpg > /dev/null
@@ -147,3 +134,7 @@ RUN wget -O- https://apt.releases.hashicorp.com/gpg | sudo gpg --dearmor -o /usr
 RUN echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/hashicorp.list
 # First install consistently fails, see https://github.com/hashicorp/vault/issues/10924#issuecomment-846123151
 RUN sudo apt update && sudo apt install -y vault && sudo apt install -y --reinstall vault && sudo rm -rf /var/lib/apt/lists/*
+
+# Install Temporal CLI tool
+RUN curl -sSf https://temporal.download/cli.sh | sh
+RUN echo export PATH="\$PATH:/home/$USER/.temporalio/bin" >> ~/.zshrc
