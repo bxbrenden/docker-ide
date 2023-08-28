@@ -21,6 +21,7 @@ USER $USER
 
 # Install pyenv and set global python interpreter
 ARG PYTHON_VERSION
+ARG PYTHON_OLD_VERSION
 RUN sudo apt update && sudo apt install --no-install-recommends -y \
   make build-essential libssl-dev zlib1g-dev \
   libbz2-dev libreadline-dev libsqlite3-dev \
