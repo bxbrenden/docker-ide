@@ -100,12 +100,15 @@ source $ZSH/oh-my-zsh.sh
 # Example aliases
 # alias zshconfig="mate ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
-#
+
+bindkey \^U backward-kill-line
 
 # pyenv in path
 export PATH=/home/brenden/.pyenv/bin:$PATH
 export PATH=/home/brenden/.pyenv/shims:$PATH
-export PATH=/home/brenden/.pyenv/versions/3.11.4/bin:$PATH
+export PATH=/home/brenden/.pyenv/versions/3.11.5/bin:$PATH
+export PATH=/home/brenden/.pyenv/versions/3.8.18/bin:$PATH
+export PATH=/home/brenden/.pyenv/versions/2.7.18/bin:$PATH
 export PATH=/home/brenden/.local/bin/:$PATH
 
 # zsh
@@ -145,6 +148,7 @@ alias ipy="ipython"
 alias calc="ipy -c"
 alias wp="which python"
 alias wp3="which python3"
+alias pv="python --version"
 
 # filesystem navigation
 alias cdg="cd ~/git"
@@ -195,4 +199,4 @@ alias ct="cargo test"
 # Misc
 alias copy="rsync -avh --progress"
 alias unz="unzip"
-alias bat="batcat"
+alias bat="batcat --style=plain"

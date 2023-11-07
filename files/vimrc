@@ -67,6 +67,8 @@ autocmd FileType html setlocal ts=2 sts=2 sw=2 expandtab
 " JavaScript / JS
 autocmd FileType javascript setlocal ts=2 sts=2 sw=2 expandtab
 
+" Golang / Go
+autocmd FileType go setlocal ts=2 sts=2 sw=2 expandtab
 set background=dark
 
 "show unnecessary whitespace as red

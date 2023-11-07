@@ -1,4 +1,4 @@
-FROM debian:bookworm-20230814
+FROM debian:bookworm-20230919
 LABEL org.opencontainers.image.authors="brendenahyde@gmail.com"
 USER root
 
@@ -22,6 +22,7 @@ USER $USER
 # Install pyenv and set global python interpreter
 ARG PYTHON_VERSION
 ARG PYTHON_OLD_VERSION
+ARG PYTHON_ADDITIONAL_VERSION
 RUN sudo apt update && sudo apt install --no-install-recommends -y \
   make build-essential libssl-dev zlib1g-dev \
   libbz2-dev libreadline-dev libsqlite3-dev \
@@ -32,6 +33,7 @@ RUN sudo apt update && sudo apt install --no-install-recommends -y \
 RUN curl https://pyenv.run | bash
 RUN /home/$USER/.pyenv/bin/pyenv install $PYTHON_VERSION
 RUN /home/$USER/.pyenv/bin/pyenv install $PYTHON_OLD_VERSION
+RUN /home/$USER/.pyenv/bin/pyenv install $PYTHON_ADDITIONAL_VERSION
 RUN echo 'eval "$(pyenv init --path)"' >> /home/$USER/.zshrc
 RUN echo 'eval "$(pyenv virtualenv-init -)"' >> /home/$USER/.zshrc
 RUN /home/$USER/.pyenv/bin/pyenv global $PYTHON_VERSION
@@ -139,3 +141,17 @@ RUN sudo apt update && sudo apt install -y vault && sudo apt install -y --reinst
 # Install Temporal CLI tool
 RUN curl -sSf https://temporal.download/cli.sh | sh
 RUN echo export PATH="\$PATH:/home/$USER/.temporalio/bin" >> ~/.zshrc
+
+# Install rust, cargo, rustup
+RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+
+# Install golang
+RUN wget https://go.dev/dl/go1.21.3.linux-arm64.tar.gz
+RUN tar xvf go1.21.3.linux-arm64.tar.gz
+RUN sudo ln -s `pwd`/go/bin/* /usr/local/bin/
+RUN rm -f go1.21.3.linux-arm64.tar.gz
+
+# Install eksctl
+RUN curl -sLO "https://github.com/eksctl-io/eksctl/releases/latest/download/eksctl_Linux_arm64.tar.gz"
+RUN tar -xzf eksctl_Linux_arm64.tar.gz && rm eksctl_Linux_arm64.tar.gz
+RUN sudo ln -s `pwd`/eksctl /usr/local/bin/eksctl
